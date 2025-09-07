@@ -1,26 +1,43 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+--bg: 255 255 255;
+--fg: 17 24 39;
+}
+.dark {
+--bg: 17 24 39;
+--fg: 229 231 235;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+html, body {
+background: rgb(var(--bg));
+color: rgb(var(--fg));
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+
+.prose pre {
+overflow: auto;
+border-radius: 0.75rem;
+padding: 1rem;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+.prose code {
+font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+
+/* Details/summary for collapsible IaC snippet */
+.prose details {
+border: 1px solid rgba(100,100,100,0.15);
+border-radius: 0.75rem;
+padding: 0.75rem 1rem;
+}
+.prose summary {
+cursor: pointer;
+font-weight: 600;
 }
