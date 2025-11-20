@@ -21,7 +21,7 @@ export default function LoginPage() {
       // Validate input
       const validation = loginSchema.safeParse({ email, password });
       if (!validation.success) {
-        setError(validation.error.errors[0].message);
+        setError(validation.error.issues[0].message);
         setLoading(false);
         return;
       }

@@ -143,32 +143,45 @@
 - [ ] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
+
+
 - [ ] 5. Implement like system
   - [ ] 5.1 Create database service for likes
     - Implement getLikeCount function to query likes table
     - Implement toggleLike function to increment/decrement likes
     - Add error handling and logging
+
+
     - Use parameterized queries to prevent SQL injection
     - _Requirements: 2.2, 2.3, 2.4, 6.2, 6.3_
 
   - [ ] 5.2 Write property tests for like persistence
     - **Property 3: Like toggle round-trip**
+
+
     - **Property 4: Like persistence**
     - **Validates: Requirements 2.2, 2.3, 2.4**
 
   - [ ] 5.3 Create like API endpoint
     - Implement POST /api/likes route handler
+
+
     - Validate request body with Zod
     - Call database service to toggle like
     - Return updated like count and liked status
+
+
     - _Requirements: 7.1_
 
   - [ ] 5.4 Write property test for like API
     - **Property 20: Like API toggle behavior**
     - **Validates: Requirements 7.1**
 
+
+
   - [ ] 5.5 Build LikeButton component
     - Create client component with like button UI
+
     - Display current like count
     - Implement optimistic UI updates
     - Handle click events to call API
@@ -176,24 +189,35 @@
     - Show active state when post is liked
     - _Requirements: 2.1, 2.2, 2.3, 2.5_
 
+
+
   - [ ] 5.6 Write property test for like button state
     - **Property 5: Like button state reflects data**
+
+
     - **Validates: Requirements 2.5**
 
   - [ ] 5.7 Integrate LikeButton into blog post page
     - Add LikeButton component to app/blog/[slug]/page.tsx
     - Fetch initial like count from database
+
     - Pass postSlug and initialLikes as props
     - Position button appropriately in the layout
     - _Requirements: 2.1, 6.5_
+
+
 
 - [ ] 6. Implement comments system
   - [ ] 6.1 Create database service for comments
     - Implement getComments function to fetch comments by post slug
     - Implement createComment function to insert new comments
+
+
     - Add sorting by createdAt descending
     - Include error handling and validation
     - _Requirements: 3.1, 3.3, 3.5, 6.2, 6.3_
+
+
 
   - [ ] 6.2 Write property tests for comments persistence
     - **Property 6: All comments displayed**
@@ -202,29 +226,43 @@
     - **Property 17: Interaction data persistence round-trip**
     - **Validates: Requirements 3.1, 3.3, 3.5, 6.2, 6.3**
 
-  - [ ] 6.3 Create comments API endpoints
+
+
+  - [x] 6.3 Create comments API endpoints
+
+
+
     - Implement GET /api/comments route to fetch comments
     - Implement POST /api/comments route to create comments
     - Validate request data with Zod schemas
     - Return appropriate status codes and error messages
     - _Requirements: 7.2, 7.3_
 
+
+
   - [ ] 6.4 Write property tests for comments API
     - **Property 21: Comments API retrieval**
     - **Property 22: Comment API creation round-trip**
     - **Validates: Requirements 7.2, 7.3**
 
-  - [ ] 6.5 Build Comments component
+  - [x] 6.5 Build Comments component
+
+
     - Create client component to display comment list
     - Implement comment form with name and content fields
     - Add form validation (non-empty fields)
     - Enable/disable submit button based on validation
+
+
     - Show loading state during submission
     - _Requirements: 3.1, 3.2_
+
+
 
   - [ ] 6.6 Write property test for comment form validation
     - **Property 7: Comment form validation**
     - **Validates: Requirements 3.2**
+
 
   - [ ] 6.7 Implement comment submission logic
     - Handle form submission in Comments component
@@ -232,14 +270,20 @@
     - Optimistically add comment to UI
     - Update comment list on successful submission
     - Handle errors and show error messages
+
     - _Requirements: 3.3, 3.4_
 
   - [ ] 6.8 Write property test for comment immediate visibility
     - **Property 9: Comment immediate visibility**
     - **Validates: Requirements 3.4**
 
+
+
   - [ ] 6.9 Integrate Comments into blog post page
     - Add Comments component to app/blog/[slug]/page.tsx
+
+
+
     - Fetch initial comments from database
     - Pass postSlug and initialComments as props
     - Position below post content

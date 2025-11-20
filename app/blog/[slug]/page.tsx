@@ -2,7 +2,9 @@ import { getPost } from '@/lib/posts';
 import CodeCopyProvider from '@/components/CodeCopyProvider';
 import Tag from '@/components/Tag';
 import LikeButton from '@/components/LikeButton';
+import Comments from '@/components/Comments';
 import { getLikeCount } from '@/lib/likes';
+import { getComments } from '@/lib/comments';
 
 export default async function PostPage({
 	params,
@@ -14,8 +16,9 @@ export default async function PostPage({
 	const type = searchParams?.type === 'til' ? 'til' : 'blog';
 	const { meta, contentHtml } = await getPost(params.slug, type);
 	
-	// Get like count for this post
+	// Get like count and comments for this post
 	const likeCount = getLikeCount(params.slug);
+	const comments = getComments(params.slug);
 
 	return (
 		<article className="prose dark:prose-invert max-w-none">
@@ -33,6 +36,9 @@ export default async function PostPage({
 			<CodeCopyProvider />
 			<div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
 				<LikeButton postSlug={params.slug} initialLikes={likeCount} />
+			</div>
+			<div className="not-prose">
+				<Comments postSlug={params.slug} initialComments={comments} />
 			</div>
 		</article>
 	);
