@@ -1,6 +1,8 @@
 import { getPost } from '@/lib/posts';
 import CodeCopyProvider from '@/components/CodeCopyProvider';
 import Tag from '@/components/Tag';
+import LikeButton from '@/components/LikeButton';
+import { getLikeCount } from '@/lib/likes';
 
 export default async function PostPage({
 	params,
@@ -11,6 +13,9 @@ export default async function PostPage({
 }) {
 	const type = searchParams?.type === 'til' ? 'til' : 'blog';
 	const { meta, contentHtml } = await getPost(params.slug, type);
+	
+	// Get like count for this post
+	const likeCount = getLikeCount(params.slug);
 
 	return (
 		<article className="prose dark:prose-invert max-w-none">
@@ -26,6 +31,9 @@ export default async function PostPage({
 			<hr />
 			<div dangerouslySetInnerHTML={{ __html: contentHtml }} />
 			<CodeCopyProvider />
+			<div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+				<LikeButton postSlug={params.slug} initialLikes={likeCount} />
+			</div>
 		</article>
 	);
 }
