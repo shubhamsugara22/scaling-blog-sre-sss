@@ -1,34 +1,24 @@
 # DevOps & SRE Blog
 
-A modern blog platform built with Next.js 14, featuring interactive elements like likes, comments, and newsletter subscriptions.
+A simple, clean blog built with Next.js 14 for sharing DevOps and SRE knowledge.
 
 ## Features
 
-- 📝 **Blog Post Editor** - Create and publish posts through a web interface with live markdown preview
-- ❤️ **Like System** - Readers can like posts with persistent storage
-- 💬 **Comments** - Interactive comment system for reader engagement
-- 📧 **Newsletter Subscription** - Email subscription for blog updates
-- 🔐 **Authentication** - Secure admin access with NextAuth.js
-- 🎨 **Modern UI** - Built with Tailwind CSS and dark mode support
-- ⚡ **Fast & Responsive** - Server-side rendering with Next.js 14
+- 📝 Markdown blog posts
+- 🎨 Clean, modern UI with Tailwind CSS
+- 🌙 Dark mode support
+- 📱 Fully responsive
+- ⚡ Fast with Next.js 14 App Router
+- 🔍 Syntax highlighting for code blocks
 
 ## Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Database**: SQLite with better-sqlite3
-- **Authentication**: NextAuth.js v5
-- **Markdown**: remark, remark-html
-- **Validation**: Zod
-- **Testing**: Jest, fast-check (property-based testing)
+- **Markdown**: remark, remark-html, rehype-highlight
 
 ## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
 
 ### Installation
 
@@ -43,98 +33,59 @@ cd devops-sre-blog
 npm install
 ```
 
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
-
-Edit `.env.local` and add:
-```env
-AUTH_SECRET=your-secret-key-here
-NEXTAUTH_URL=http://localhost:3000
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=your-secure-password
-```
-
-4. Initialize the database and create admin user:
-```bash
-npm run seed:admin
-```
-
-5. Run the development server:
+3. Run the development server:
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see your blog.
 
-## Usage
+## Adding Blog Posts
 
-### Creating Blog Posts
+Create markdown files in the `content/blog/` directory:
 
-1. Navigate to `/login` and sign in with your admin credentials
-2. Go to `/admin/editor` to access the post editor
-3. Write your post in Markdown with live preview
-4. Add title, tags, and summary
-5. Click "Publish Post" to save
+```markdown
+---
+title: "Your Post Title"
+date: "2024-01-15"
+tags: ["devops", "kubernetes"]
+summary: "A brief summary of your post"
+---
 
-### Managing Content
-
-- **Blog Posts**: Stored as markdown files in `content/blog/`
-- **TIL Posts**: Stored in `content/til/`
-- **Database**: SQLite database (`blog.db`) stores likes, comments, and subscribers
+Your markdown content here...
+```
 
 ## Project Structure
 
 ```
 ├── app/                    # Next.js app directory
-│   ├── admin/             # Admin routes (protected)
-│   ├── api/               # API routes
-│   └── blog/              # Blog post pages
+│   ├── blog/              # Blog post pages
+│   └── til/               # Today I Learned pages
 ├── components/            # React components
-├── lib/                   # Utility functions and services
-│   ├── db.ts             # Database initialization
-│   ├── likes.ts          # Like system
-│   ├── comments.ts       # Comment system
-│   ├── subscribers.ts    # Subscription system
-│   └── auth.ts           # Authentication
 ├── content/              # Markdown content
 │   ├── blog/            # Blog posts
-│   └── til/             # Today I Learned posts
-└── __tests__/           # Test files
+│   └── til/             # TIL posts
+└── lib/                  # Utility functions
+    └── posts.ts         # Post loading logic
 ```
 
-## API Endpoints
+## Deploying to Vercel
 
-- `POST /api/likes` - Toggle like on a post
-- `GET /api/comments?postSlug={slug}` - Get comments for a post
-- `POST /api/comments` - Create a new comment
-- `POST /api/subscribe` - Subscribe to newsletter
+1. Push your code to GitHub
 
-## Testing
+2. Go to [Vercel](https://vercel.com) and import your repository
 
-Run tests:
-```bash
-npm test
-```
+3. Vercel will auto-detect Next.js and deploy
 
-Run tests in watch mode:
-```bash
-npm run test:watch
-```
+That's it! Your blog is live.
 
 ## Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm start` - Start production server
-- `npm test` - Run tests
-- `npm run seed:admin` - Create admin user
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+- `npm run lint` - Run ESLint
 
 ## License
 
-MIT License - feel free to use this project for your own blog!
+MIT License - feel free to use this for your own blog!

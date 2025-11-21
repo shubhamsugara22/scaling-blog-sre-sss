@@ -43,10 +43,3 @@ next-env.d.ts
 # kiro
 
 .kiro/
-
-# blog database and logs
-blog.db
-blog.db-shm
-blog.db-wal
-test-*.db
-logs/
