@@ -41,3 +41,6 @@ padding: 0.75rem 1rem;
 cursor: pointer;
 font-weight: 600;
 }
+
+/* Asciinema player styles */
+@import 'asciinema-player/dist/bundle/asciinema-player.css';

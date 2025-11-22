@@ -1,6 +1,7 @@
 import { getPost } from '@/lib/posts';
 import CodeCopyProvider from '@/components/CodeCopyProvider';
 import Tag from '@/components/Tag';
+import AsciinemaHydrator from '@/components/AsciinemaHydrator';
 
 export default async function PostPage({
 	params,
@@ -26,6 +27,7 @@ export default async function PostPage({
 			<hr />
 			<div dangerouslySetInnerHTML={{ __html: contentHtml }} />
 			<CodeCopyProvider />
+			<AsciinemaHydrator />
 		</article>
 	);
 }

@@ -1,0 +1,36 @@
+declare module 'asciinema-player' {
+  export interface PlayerOptions {
+    cols?: number;
+    rows?: number;
+    autoPlay?: boolean;
+    preload?: boolean;
+    loop?: boolean | number;
+    startAt?: number | string;
+    speed?: number;
+    idleTimeLimit?: number;
+    theme?: string;
+    poster?: string;
+    fit?: 'width' | 'height' | 'both' | false;
+    controls?: boolean | 'auto';
+    markers?: Array<[number, string]>;
+    pauseOnMarkers?: boolean;
+    terminalFontSize?: string;
+    terminalFontFamily?: string;
+    terminalLineHeight?: number;
+  }
+
+  export interface Player {
+    play(): void;
+    pause(): void;
+    seek(time: number): void;
+    getCurrentTime(): number;
+    getDuration(): number;
+    dispose(): void;
+  }
+
+  export function create(
+    src: string,
+    element: HTMLElement,
+    options?: PlayerOptions
+  ): Player;
+}
