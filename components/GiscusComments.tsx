@@ -29,34 +29,74 @@ export default function GiscusComments({
   loading = 'lazy',
 }: GiscusConfig) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Check initial theme from localStorage and document class
-    const isDark = 
-      localStorage.getItem('theme') === 'dark' || 
-      document.documentElement.classList.contains('dark')
-    setTheme(isDark ? 'dark' : 'light')
+    try {
+      // Validate required configuration
+      if (!repo || !repoId || !category || !categoryId) {
+        console.error('Giscus: Missing required configuration');
+        setError('Comments configuration is incomplete');
+        return;
+      }
 
-    // Listen for theme changes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const isDark = document.documentElement.classList.contains('dark')
-          setTheme(isDark ? 'dark' : 'light')
-        }
+      // Check initial theme from localStorage and document class
+      const isDark = 
+        localStorage.getItem('theme') === 'dark' || 
+        document.documentElement.classList.contains('dark')
+      setTheme(isDark ? 'dark' : 'light')
+
+      // Listen for theme changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            const isDark = document.documentElement.classList.contains('dark')
+            setTheme(isDark ? 'dark' : 'light')
+          }
+        })
       })
-    })
 
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
+      })
 
-    return () => observer.disconnect()
-  }, [])
+      return () => observer.disconnect()
+    } catch (err) {
+      console.error('Error initializing Giscus:', err);
+      setError('Failed to initialize comments');
+    }
+  }, [repo, repoId, category, categoryId])
+
+  if (error) {
+    return (
+      <section 
+        className="mt-8 pt-8 border-t border-black/10 dark:border-white/10"
+        aria-labelledby="comments-heading"
+      >
+        <h2 id="comments-heading" className="text-2xl font-bold mb-4">
+          Comments
+        </h2>
+        <div className="border border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700 p-4 rounded-md" role="alert">
+          <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+            <strong>Comments Unavailable:</strong> {error}
+          </p>
+          <p className="text-yellow-600 dark:text-yellow-400 text-xs mt-2">
+            Please check back later or contact the site administrator.
+          </p>
+        </div>
+      </section>
+    )
+  }
 
   return (
-    <div className="mt-8 pt-8 border-t border-black/10 dark:border-white/10">
+    <section 
+      className="mt-8 pt-8 border-t border-black/10 dark:border-white/10"
+      aria-labelledby="comments-heading"
+    >
+      <h2 id="comments-heading" className="text-2xl font-bold mb-4">
+        Comments
+      </h2>
       <Giscus
         repo={repo}
         repoId={repoId}
@@ -70,6 +110,6 @@ export default function GiscusComments({
         lang={lang}
         loading={loading}
       />
-    </div>
+    </section>
   )
 }

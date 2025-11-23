@@ -89,11 +89,11 @@ export default function AsciinemaPlayer({
 
   if (error) {
     return (
-      <div className="asciinema-error border border-red-300 bg-red-50 p-4 rounded-md">
-        <p className="text-red-800 text-sm">
+      <div className="asciinema-error border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700 p-4 rounded-md" role="alert">
+        <p className="text-red-800 dark:text-red-200 text-sm">
           <strong>Asciinema Player Error:</strong> {error}
         </p>
-        <p className="text-red-600 text-xs mt-2">
+        <p className="text-red-600 dark:text-red-400 text-xs mt-2">
           Cast ID: {castId}
         </p>
       </div>
@@ -101,13 +101,13 @@ export default function AsciinemaPlayer({
   }
 
   return (
-    <div className="asciinema-player-wrapper my-6">
+    <div className="asciinema-player-wrapper my-6" role="region" aria-label="Terminal recording player">
       {isLoading && (
-        <div className="flex items-center justify-center p-8 bg-gray-100 rounded-md">
+        <div className="flex items-center justify-center p-8 bg-gray-100 rounded-md" role="status" aria-live="polite">
           <div className="text-gray-600">Loading terminal recording...</div>
         </div>
       )}
-      <div ref={containerRef} className={isLoading ? 'hidden' : ''} />
+      <div ref={containerRef} className={isLoading ? 'hidden' : ''} aria-label={`Terminal recording ${castId}`} />
     </div>
   );
 }

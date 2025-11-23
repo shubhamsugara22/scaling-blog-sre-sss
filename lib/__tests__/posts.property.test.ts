@@ -52,7 +52,8 @@ describe('Post Rendering Property Tests', () => {
             expect(dateObj.toString()).not.toBe('Invalid Date');
           } catch (error) {
             // If post doesn't exist for this type, skip
-            if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            const err = error as any;
+            if (err.code === 'ENOENT' || (err.message && err.message.includes('Post not found'))) {
               return;
             }
             throw error;

@@ -10,23 +10,43 @@ export interface ReadingTimeResult {
  * @returns Reading time result with minutes, word count, and formatted text
  */
 export function calculateReadingTime(content: string): ReadingTimeResult {
-  // Strip markdown syntax and HTML tags
-  const plainText = stripMarkdownAndHtml(content);
-  
-  // Count words
-  const words = countWords(plainText);
-  
-  // Calculate reading time (225 words per minute average)
-  const minutes = Math.max(1, Math.round(words / 225));
-  
-  // Format output
-  const text = `${minutes} min read`;
-  
-  return {
-    minutes,
-    words,
-    text
-  };
+  try {
+    // Handle empty or invalid content
+    if (!content || typeof content !== 'string') {
+      console.warn('Reading time calculation: Empty or invalid content provided');
+      return {
+        minutes: 1,
+        words: 0,
+        text: '1 min read'
+      };
+    }
+    
+    // Strip markdown syntax and HTML tags
+    const plainText = stripMarkdownAndHtml(content);
+    
+    // Count words
+    const words = countWords(plainText);
+    
+    // Calculate reading time (225 words per minute average)
+    const minutes = Math.max(1, Math.round(words / 225));
+    
+    // Format output
+    const text = `${minutes} min read`;
+    
+    return {
+      minutes,
+      words,
+      text
+    };
+  } catch (error) {
+    console.error('Error calculating reading time:', error);
+    // Return fallback value
+    return {
+      minutes: 1,
+      words: 0,
+      text: '1 min read'
+    };
+  }
 }
 
 /**

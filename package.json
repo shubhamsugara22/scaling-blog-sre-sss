@@ -16,6 +16,7 @@
     "@giscus/react": "^3.1.0",
     "asciinema-player": "^3.12.1",
     "gray-matter": "^4.0.3",
+    "mermaid": "^11.12.1",
     "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -28,6 +29,8 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "remark-mermaidjs": "^7.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0"
   },

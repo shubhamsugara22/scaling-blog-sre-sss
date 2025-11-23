@@ -10,36 +10,60 @@ export interface TocHeading {
  * @returns Array of heading objects with id, text, and level
  */
 export function extractHeadings(html: string): TocHeading[] {
-  const headings: TocHeading[] = [];
-  const usedIds = new Set<string>();
-  
-  // Match H2 and H3 tags with their content
-  // This regex captures: <h2>content</h2> or <h2 id="...">content</h2>
-  const headingRegex = /<h([23])(?:\s+id="([^"]*)")?[^>]*>(.*?)<\/h\1>/gi;
-  
-  let match;
-  while ((match = headingRegex.exec(html)) !== null) {
-    const level = parseInt(match[1], 10);
-    const existingId = match[2];
-    const htmlContent = match[3];
+  try {
+    // Handle empty or invalid HTML
+    if (!html || typeof html !== 'string') {
+      console.warn('TOC extraction: Empty or invalid HTML provided');
+      return [];
+    }
     
-    // Strip HTML tags from heading content to get plain text
-    const text = stripHtmlTags(htmlContent);
+    const headings: TocHeading[] = [];
+    const usedIds = new Set<string>();
     
-    // Generate or use existing ID
-    const baseId = existingId || generateId(text);
-    const id = ensureUniqueId(baseId, usedIds);
+    // Match H2 and H3 tags with their content
+    // This regex captures: <h2>content</h2> or <h2 id="...">content</h2>
+    const headingRegex = /<h([23])(?:\s+id="([^"]*)")?[^>]*>(.*?)<\/h\1>/gi;
     
-    usedIds.add(id);
+    let match;
+    while ((match = headingRegex.exec(html)) !== null) {
+      try {
+        const level = parseInt(match[1], 10);
+        const existingId = match[2];
+        const htmlContent = match[3];
+        
+        // Strip HTML tags from heading content to get plain text
+        const text = stripHtmlTags(htmlContent);
+        
+        // Skip empty headings
+        if (!text.trim()) {
+          console.warn('TOC extraction: Skipping empty heading');
+          continue;
+        }
+        
+        // Generate or use existing ID
+        const baseId = existingId || generateId(text);
+        const id = ensureUniqueId(baseId, usedIds);
+        
+        usedIds.add(id);
+        
+        headings.push({
+          id,
+          text,
+          level
+        });
+      } catch (error) {
+        console.error('Error processing heading:', error);
+        // Continue processing other headings
+        continue;
+      }
+    }
     
-    headings.push({
-      id,
-      text,
-      level
-    });
+    return headings;
+  } catch (error) {
+    console.error('Error extracting headings:', error);
+    // Return empty array as fallback
+    return [];
   }
-  
-  return headings;
 }
 
 /**

@@ -23,6 +23,29 @@ color: rgb(var(--fg));
 overflow: auto;
 border-radius: 0.75rem;
 padding: 1rem;
+/* Touch-friendly horizontal scroll on mobile (Requirement 10.3) */
+-webkit-overflow-scrolling: touch;
+/* Ensure scrollbar is visible and touch-friendly on mobile */
+scrollbar-width: thin;
+scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+/* Custom scrollbar for webkit browsers (Safari, Chrome on mobile) */
+.prose pre::-webkit-scrollbar {
+height: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+background: transparent;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+background-color: rgba(156, 163, 175, 0.5);
+border-radius: 4px;
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover {
+background-color: rgba(156, 163, 175, 0.7);
 }
 
 
@@ -44,3 +67,128 @@ font-weight: 600;
 
 /* Asciinema player styles */
 @import 'asciinema-player/dist/bundle/asciinema-player.css';
+
+/* Mermaid diagram responsive styles (Requirement 10.3) */
+.prose .mermaid {
+/* Make diagrams responsive with viewport scaling */
+max-width: 100%;
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+/* Center diagrams */
+display: flex;
+justify-content: center;
+/* Add some padding for mobile */
+padding: 1rem 0;
+}
+
+.prose .mermaid svg {
+/* Allow SVG to scale responsively */
+max-width: 100%;
+height: auto;
+/* Minimum size to ensure readability */
+min-width: 300px;
+}
+
+/* On mobile, allow horizontal scroll if diagram is too wide */
+@media (max-width: 768px) {
+.prose .mermaid {
+	overflow-x: auto;
+	justify-content: flex-start;
+}
+
+.prose .mermaid svg {
+	/* On very small screens, allow diagrams to be scrollable */
+	min-width: 100%;
+	width: max-content;
+}
+}
+
+/* Screen reader only utility */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+	position: static;
+	width: auto;
+	height: auto;
+	padding: inherit;
+	margin: inherit;
+	overflow: visible;
+	clip: auto;
+	white-space: normal;
+}
+
+/* Ensure visible focus indicators for keyboard navigation (Requirement 10.4) */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+	outline: 2px solid rgb(59, 130, 246);
+	outline-offset: 2px;
+	border-radius: 0.25rem;
+}
+
+/* Focus styles for interactive elements in dark mode */
+.dark a:focus-visible,
+.dark button:focus-visible,
+.dark [role="button"]:focus-visible {
+	outline-color: rgb(96, 165, 250);
+}
+
+/* Responsive improvements for various screen sizes (Requirement 10.2, 10.3) */
+@media (max-width: 640px) {
+/* Reduce prose max-width on very small screens */
+.prose {
+	font-size: 0.95rem;
+}
+
+/* Ensure images don't overflow on small screens */
+.prose img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* Adjust code block padding on mobile */
+.prose pre {
+	padding: 0.75rem;
+	padding-top: 2.5rem;
+}
+}
+
+/* Tablet and medium screens */
+@media (min-width: 641px) and (max-width: 1023px) {
+.prose {
+	max-width: 100%;
+}
+}
+
+/* Ensure touch targets are accessible on mobile */
+@media (hover: none) and (pointer: coarse) {
+/* Touch-friendly buttons and links */
+.prose a,
+button,
+.copy-btn,
+.language-badge {
+	min-height: 44px;
+	min-width: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Exception for inline links in prose */
+.prose p a,
+.prose li a {
+	min-height: auto;
+	min-width: auto;
+	display: inline;
+}
+}

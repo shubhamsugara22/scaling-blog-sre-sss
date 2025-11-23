@@ -24,10 +24,15 @@ export default function Header() {
 				<Link href="/" className="font-bold text-lg">
 					DevOps & SRE
 				</Link>
-				<nav className="flex items-center gap-5 text-sm">
+				<nav className="flex items-center gap-5 text-sm" aria-label="Main navigation">
 					<Link href="/til">TIL</Link>
 					<Link href="/about">About</Link>
-					<button onClick={toggle} className="px-3 py-1 rounded-xl border text-xs">
+					<button 
+						onClick={toggle} 
+						className="px-3 py-1 rounded-xl border text-xs"
+						aria-label={`Switch to ${dark ? 'light' : 'dark'} mode`}
+						aria-pressed={dark}
+					>
 						{dark ? 'Light' : 'Dark'}
 					</button>
 				</nav>

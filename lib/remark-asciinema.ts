@@ -19,75 +19,120 @@ import type { Root, Code, Html } from 'mdast';
  */
 export default function remarkAsciinema() {
   return (tree: Root) => {
-    visit(tree, 'code', (node: Code, index, parent) => {
-      if (node.lang === 'asciinema') {
-        // Parse the code block content for configuration
-        const config = parseAsciinemaConfig(node.value);
-        
-        if (config.castId) {
-          // Replace the code block with an HTML node containing a data attribute
-          const htmlNode: Html = {
-            type: 'html',
-            value: createAsciinemaHtml(config),
-          };
-          
-          if (parent && typeof index === 'number') {
-            parent.children[index] = htmlNode;
+    try {
+      visit(tree, 'code', (node: Code, index, parent) => {
+        if (node.lang === 'asciinema') {
+          try {
+            // Parse the code block content for configuration
+            const config = parseAsciinemaConfig(node.value);
+            
+            if (config.castId) {
+              // Replace the code block with an HTML node containing a data attribute
+              const htmlNode: Html = {
+                type: 'html',
+                value: createAsciinemaHtml(config),
+              };
+              
+              if (parent && typeof index === 'number') {
+                parent.children[index] = htmlNode;
+              }
+            } else {
+              console.warn('Asciinema code block missing cast-id');
+              // Keep the original code block with an error message
+              const errorNode: Html = {
+                type: 'html',
+                value: '<div class="asciinema-error"><p><strong>Error:</strong> Asciinema block missing cast-id</p></div>',
+              };
+              if (parent && typeof index === 'number') {
+                parent.children[index] = errorNode;
+              }
+            }
+          } catch (error) {
+            console.error('Error processing Asciinema code block:', error);
+            // Keep original code block on error
           }
         }
-      }
-    });
+      });
 
-    // Also handle shortcode syntax [asciinema:123456]
-    visit(tree, 'text', (node, index, parent) => {
-      const text = node.value;
-      const shortcodeRegex = /\[asciinema:([^\]]+)\]/g;
-      
-      if (shortcodeRegex.test(text)) {
-        const parts: any[] = [];
-        let lastIndex = 0;
-        
-        text.replace(shortcodeRegex, (match, params, offset) => {
-          // Add text before the shortcode
-          if (offset > lastIndex) {
-            parts.push({
-              type: 'text',
-              value: text.slice(lastIndex, offset),
+      // Also handle shortcode syntax [asciinema:123456]
+      visit(tree, 'text', (node, index, parent) => {
+        try {
+          const text = node.value;
+          const shortcodeRegex = /\[asciinema:([^\]]+)\]/g;
+          
+          if (shortcodeRegex.test(text)) {
+            const parts: any[] = [];
+            let lastIndex = 0;
+            
+            text.replace(shortcodeRegex, (match, params, offset) => {
+              try {
+                // Add text before the shortcode
+                if (offset > lastIndex) {
+                  parts.push({
+                    type: 'text',
+                    value: text.slice(lastIndex, offset),
+                  });
+                }
+                
+                // Parse shortcode parameters
+                const paramParts = params.split(':');
+                const castId = paramParts[0];
+                
+                if (!castId) {
+                  console.warn('Asciinema shortcode missing cast ID');
+                  parts.push({
+                    type: 'text',
+                    value: match, // Keep original text
+                  });
+                } else {
+                  const config = {
+                    castId,
+                    theme: paramParts[1] || 'monokai',
+                    speed: paramParts[2] ? parseFloat(paramParts[2]) : 1,
+                  };
+                  
+                  // Add HTML node for Asciinema player
+                  parts.push({
+                    type: 'html',
+                    value: createAsciinemaHtml(config),
+                  });
+                }
+                
+                lastIndex = offset + match.length;
+              } catch (error) {
+                console.error('Error processing Asciinema shortcode:', error);
+                // Keep original text on error
+                parts.push({
+                  type: 'text',
+                  value: match,
+                });
+                lastIndex = offset + match.length;
+              }
+              return match;
             });
+            
+            // Add remaining text
+            if (lastIndex < text.length) {
+              parts.push({
+                type: 'text',
+                value: text.slice(lastIndex),
+              });
+            }
+            
+            // Replace the text node with the parts
+            if (parent && typeof index === 'number' && parts.length > 0) {
+              parent.children.splice(index, 1, ...parts);
+            }
           }
-          
-          // Parse shortcode parameters
-          const paramParts = params.split(':');
-          const config = {
-            castId: paramParts[0],
-            theme: paramParts[1] || 'monokai',
-            speed: paramParts[2] ? parseFloat(paramParts[2]) : 1,
-          };
-          
-          // Add HTML node for Asciinema player
-          parts.push({
-            type: 'html',
-            value: createAsciinemaHtml(config),
-          });
-          
-          lastIndex = offset + match.length;
-          return match;
-        });
-        
-        // Add remaining text
-        if (lastIndex < text.length) {
-          parts.push({
-            type: 'text',
-            value: text.slice(lastIndex),
-          });
+        } catch (error) {
+          console.error('Error processing text node for Asciinema shortcodes:', error);
+          // Keep original text node on error
         }
-        
-        // Replace the text node with the parts
-        if (parent && typeof index === 'number' && parts.length > 0) {
-          parent.children.splice(index, 1, ...parts);
-        }
-      }
-    });
+      });
+    } catch (error) {
+      console.error('Fatal error in remarkAsciinema plugin:', error);
+      // Don't modify tree on fatal error
+    }
   };
 }
 

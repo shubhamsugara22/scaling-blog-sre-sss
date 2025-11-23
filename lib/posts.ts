@@ -8,6 +8,8 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { calculateReadingTime, ReadingTimeResult } from './reading-time';
 import { extractHeadings, TocHeading } from './toc';
 import remarkAsciinema from './remark-asciinema';
+import rehypeImageHandler from './rehype-image-handler';
+import rehypeMermaidComponent from './rehype-mermaid-component';
 
 const BLOG_PATH = path.join(process.cwd(), 'content', 'blog');
 const TIL_PATH = path.join(process.cwd(), 'content', 'til');
@@ -45,56 +47,92 @@ export async function getAllPosts(dir = BLOG_PATH): Promise<PostMeta[]> {
 }
 
 export async function getPost(slug: string, type: 'blog' | 'til' = 'blog'): Promise<EnhancedPost> {
-	const base = type === 'blog' ? BLOG_PATH : TIL_PATH;
-	const file = path.join(base, `${slug}.md`);
-	const raw = fs.readFileSync(file, 'utf8');
-	const { data, content } = matter(raw);
-	
-	// Calculate reading time from raw markdown content
-	const readingTime = calculateReadingTime(content);
-	
-	// Process markdown with enhanced pipeline
-	// Note: rehype plugins need to be applied after converting to HTML
-	const processed = await remark()
-		.use(remarkAsciinema) // Transform Asciinema syntax before converting to HTML
-		.use(html, { sanitize: false })
-		.use(() => (tree) => tree) // Pass-through for remark
-		.process(content);
-	
-	let contentHtml = String(processed);
-	
-	// Apply rehype plugins manually by using unified with rehype
-	const { unified } = await import('unified');
-	const rehypeParse = (await import('rehype-parse')).default;
-	const rehypeStringify = (await import('rehype-stringify')).default;
-	
-	const rehypeProcessed = await unified()
-		.use(rehypeParse, { fragment: true })
-		.use(rehypeSlug)
-		.use(rehypeAutolinkHeadings, {
-			behavior: 'wrap',
-			properties: {
-				className: ['anchor-link']
+	try {
+		const base = type === 'blog' ? BLOG_PATH : TIL_PATH;
+		const file = path.join(base, `${slug}.md`);
+		
+		// Check if file exists
+		if (!fs.existsSync(file)) {
+			throw new Error(`Post not found: ${slug}`);
+		}
+		
+		const raw = fs.readFileSync(file, 'utf8');
+		const { data, content } = matter(raw);
+		
+		// Validate required metadata
+		if (!data.title || !data.date) {
+			console.warn(`Post ${slug} missing required metadata (title or date)`);
+		}
+		
+		// Calculate reading time from raw markdown content
+		const readingTime = calculateReadingTime(content);
+		
+		let contentHtml = '';
+		
+		try {
+			// Use unified pipeline to process markdown through remark and rehype
+			const { unified } = await import('unified');
+			const remarkParse = (await import('remark-parse')).default;
+			const { default: remarkRehype } = await import('remark-rehype');
+			const rehypeStringify = (await import('rehype-stringify')).default;
+			
+			const processed = await unified()
+				// Parse markdown
+				.use(remarkParse)
+				// Transform Asciinema syntax before converting to HTML
+				.use(remarkAsciinema)
+				// Convert markdown to HTML (hast)
+				.use(remarkRehype, { allowDangerousHtml: true })
+				// Apply rehype plugins
+				.use(rehypeSlug)
+				.use(rehypeAutolinkHeadings, {
+					behavior: 'wrap',
+					properties: {
+						className: ['anchor-link']
+					}
+				})
+				.use(rehypeMermaidComponent)
+				.use(rehypeImageHandler)
+				// Convert back to HTML string
+				.use(rehypeStringify, {
+					allowDangerousHtml: true,
+					allowDangerousCharacters: true
+				})
+				.process(content);
+			
+			contentHtml = String(processed);
+		} catch (error) {
+			console.error(`Error processing markdown for ${slug}:`, error);
+			// Fallback to basic HTML conversion
+			try {
+				const processed = await remark()
+					.use(html, { sanitize: false })
+					.process(content);
+				contentHtml = String(processed);
+			} catch (fallbackError) {
+				console.error(`Fallback processing also failed for ${slug}:`, fallbackError);
+				contentHtml = `<div class="error-message"><p><strong>Error processing markdown content.</strong></p><pre>${content}</pre></div>`;
 			}
-		})
-		.use(rehypeStringify)
-		.process(contentHtml);
-	
-	contentHtml = String(rehypeProcessed);
-	
-	// Extract headings for table of contents
-	const headings = extractHeadings(contentHtml);
-	
-	return {
-		meta: {
-			slug,
-			title: data.title as string,
-			date: data.date as string,
-			tags: (data.tags || []) as string[],
-			summary: (data.summary || '') as string,
-			readingTime,
-		},
-		contentHtml,
-		headings,
-	};
+		}
+		
+		// Extract headings for table of contents
+		const headings = extractHeadings(contentHtml);
+		
+		return {
+			meta: {
+				slug,
+				title: (data.title as string) || 'Untitled Post',
+				date: (data.date as string) || new Date().toISOString(),
+				tags: (data.tags || []) as string[],
+				summary: (data.summary || '') as string,
+				readingTime,
+			},
+			contentHtml,
+			headings,
+		};
+	} catch (error) {
+		console.error(`Fatal error loading post ${slug}:`, error);
+		// Re-throw to let Next.js handle with 404 or error page
+		throw error;
+	}
 }

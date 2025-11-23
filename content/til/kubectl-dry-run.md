@@ -5,4 +5,4 @@ summary: "Use the API server to validate without storing the object."
 tags: ["kubernetes", "til"]
 ---
 ```bash
-kubectl apply -f deployment.yaml --dry-run=server -o yam
+kubectl apply -f deployment.yaml --dry-run=server -o yaml
