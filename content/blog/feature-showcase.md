@@ -377,11 +377,13 @@ spec:
 
 ## Asciinema Terminal Recordings
 
-Embed terminal recordings to show real command-line workflows. Here's an example using the shortcode syntax:
+Embed terminal recordings to show real command-line workflows. 
 
+<!-- Shortcode syntax example (commented out):
 [asciinema:335480]
+-->
 
-You can also use the code block syntax for more control:
+You can use the code block syntax for more control:
 
 ```asciinema
 cast-id: 335480

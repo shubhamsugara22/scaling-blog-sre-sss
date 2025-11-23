@@ -73,16 +73,22 @@ export async function getPost(slug: string, type: 'blog' | 'til' = 'blog'): Prom
 			// Use unified pipeline to process markdown through remark and rehype
 			const { unified } = await import('unified');
 			const remarkParse = (await import('remark-parse')).default;
+			const { default: remarkGfm } = await import('remark-gfm');
 			const { default: remarkRehype } = await import('remark-rehype');
+			const { default: rehypeRaw } = await import('rehype-raw');
 			const rehypeStringify = (await import('rehype-stringify')).default;
 			
 			const processed = await unified()
 				// Parse markdown
 				.use(remarkParse)
+				// Enable GitHub Flavored Markdown (tables, strikethrough, task lists, etc.)
+				.use(remarkGfm)
 				// Transform Asciinema syntax before converting to HTML
 				.use(remarkAsciinema)
 				// Convert markdown to HTML (hast)
 				.use(remarkRehype, { allowDangerousHtml: true })
+				// Parse raw HTML nodes
+				.use(rehypeRaw)
 				// Apply rehype plugins
 				.use(rehypeSlug)
 				.use(rehypeAutolinkHeadings, {
@@ -94,10 +100,7 @@ export async function getPost(slug: string, type: 'blog' | 'til' = 'blog'): Prom
 				.use(rehypeMermaidComponent)
 				.use(rehypeImageHandler)
 				// Convert back to HTML string
-				.use(rehypeStringify, {
-					allowDangerousHtml: true,
-					allowDangerousCharacters: true
-				})
+				.use(rehypeStringify)
 				.process(content);
 			
 			contentHtml = String(processed);
